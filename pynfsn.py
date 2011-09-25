@@ -80,7 +80,52 @@ class NFSN_database( NFSN_instance ):
     pass
 
 class NFSN_dns( NFSN_instance ):
-    pass
+    def __init__(self, *args, **kwargs):
+        NFSN_instance.__init__(self, *args, **kwargs)
+        properties= ["expire","minTTL","refresh","retry","serial"]
+
+    def expire(self, set_to=None):
+        url= self.base_url+"/expire"
+        return self._property_get_set(url, set_to)
+
+    def minTTL(self, set_to=None):
+        url= self.base_url+"/minTTL"
+        return self._property_get_set(url, set_to)
+
+    def refresh(self, set_to=None):
+        url= self.base_url+"/refresh"
+        return self._property_get_set(url, set_to)
+
+    def retry(self, set_to=None):
+        url= self.base_url+"/retry"
+        return self._property_get_set(url, set_to)
+
+    def serial(self, set_to=None):
+        url= self.base_url+"/serial"
+        return self._property_get_set(url, set_to)
+
+    def addRR( self, name, type, data, ttl ):
+        url= self.base_url+"/addRR"
+        return self.connection.post( url, {"name":name, "type":type, "data":data, "ttl":ttl})
+
+    def listRRs( self, name=None, type=None, data=None):
+        url= self.base_url+"/listRRs"
+        params={}
+        if name:
+            params["name"]=name
+        if type:
+            params["type"]=type
+        if data:
+            params["data"]=data
+        return self.connection.post( url, params)
+
+    def removeRR( self, name, type, data):
+        url= self.base_url+"/removeRR"
+        return self.connection.post( url, {"name":name, "type":type, "data":data})
+
+    def updateSerial(self):
+        url= self.base_url+"/updateSerial"
+        return self.connection.post(url)
 
 class NFSN_member( NFSN_instance ):
     pass
