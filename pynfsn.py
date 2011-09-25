@@ -5,7 +5,7 @@ import hashlib
 import urllib, urllib2
 
 
-class NFSN_base(object):
+class NFSN_connection(object):
     '''This class contains only the bare functionality for doing API conformant requests'''
     SALT_CHARS= string.ascii_letters + string.digits
     BASE_URL= "https://api.nearlyfreespeech.net"
@@ -58,3 +58,46 @@ class NFSN_base(object):
         r.data= data
         r.get_method = lambda: 'PUT'
         return self._execute_http_method(r)
+
+class NFSN_instance(object):
+    def __init__( self, instance_id, connection ):
+        self.instance_id= instance_id
+        self.connection= connection
+        assert self.__class__.__name__.startswith("NFSN_")
+        class_name= self.__class__.__name__[5:]
+        self.base_url= "/"+ class_name +"/"+ instance_id
+
+    def _property_get_set(self, url, set_to=None):
+        if set_to is None:
+            return self.connection.get( url )
+        else:
+            self.connection.put( url, str(set_to) )
+
+class NFSN_account( NFSN_instance ):
+    pass
+
+class NFSN_database( NFSN_instance ):
+    pass
+
+class NFSN_dns( NFSN_instance ):
+    pass
+
+class NFSN_member( NFSN_instance ):
+    pass
+
+class NFSN_site( NFSN_instance ):
+    pass
+
+class NFSN(object):
+    def __init__( self, login, api_key ):
+        self.connection= NFSN_connection( login, api_key )
+    def account( self, instance_id ):
+        return NFSN_account( instance_id , self.connection)
+    def database( self, instance_id ):
+        return NFSN_database( instance_id , self.connection)
+    def dns( self, instance_id ):
+        return NFSN_dns( instance_id , self.connection)
+    def member( self, instance_id ):
+        return NFSN_member( instance_id , self.connection)
+    def site( self, instance_id ):
+        return NFSN_site( instance_id , self.connection)
