@@ -3,6 +3,7 @@ import string
 import random
 import hashlib
 import urllib, urllib2
+import json
 
 
 class NFSN_connection(object):
@@ -41,10 +42,13 @@ class NFSN_connection(object):
     def _execute_http_method(self, request):
         request.headers=self._headers( request.nfsn_url, request.data)
         try:
-            return urllib2.urlopen(request).read()
+            s= urllib2.urlopen(request).read()
         except urllib2.HTTPError, e:
             raise Exception("error on GET: "+str(e.code)+str(e.read()))
-
+        try:
+            return json.loads(s)
+        except:
+            return s
     def get(self, url):
         return self._execute_http_method(self._standard_request(url))
 
