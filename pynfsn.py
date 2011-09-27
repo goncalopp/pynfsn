@@ -2,7 +2,7 @@ import time
 import string
 import random
 import hashlib
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import json
 
 
@@ -15,7 +15,7 @@ class NFSN_connection(object):
         self.login, self.api_key= login, api_key
 
     def _salt(self):
-        return "".join([random.choice(self.SALT_CHARS) for x in xrange(16)])
+        return "".join([random.choice(self.SALT_CHARS) for x in range(16)])
 
     def _timestamp(self):
         return str(int(time.time()))
@@ -27,7 +27,7 @@ class NFSN_connection(object):
         t= self._timestamp()
         s= self._salt()
         body_hash= hashlib.sha1(body).hexdigest()
-        h_str= ";".join([l, t, s, self.api_key, url, body_hash])
+        h_str= ";".join([l, t, s, self.api_key, url, body_hash]).encode("utf-8")
         h= hashlib.sha1(h_str).hexdigest()
         return ";".join([l, t, s, h])
 
@@ -35,15 +35,15 @@ class NFSN_connection(object):
         return {"X-NFSN-Authentication" : self._auth_header(url, body)}
 
     def _standard_request(self,url):
-        r=urllib2.Request(self.BASE_URL+url)
+        r=urllib.request.Request(self.BASE_URL+url)
         r.nfsn_url=url
         return r
 
     def _execute_http_method(self, request):
         request.headers=self._headers( request.nfsn_url, request.data)
         try:
-            s= urllib2.urlopen(request).read()
-        except urllib2.HTTPError, e:
+            s= urllib.request.urlopen(request).read().decode()
+        except urllib.error.HTTPError as e:
             raise Exception("error on GET: "+str(e.code)+str(e.read()))
         try:
             return json.loads(s)
@@ -54,7 +54,7 @@ class NFSN_connection(object):
 
     def post(self, url, parameters={}):
         r= self._standard_request(url)
-        r.data= urllib.urlencode(parameters)
+        r.data= urllib.parse.urlencode(parameters).encode("utf-8")
         return self._execute_http_method(r)
 
     def put(self, url, data):
