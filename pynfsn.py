@@ -4,6 +4,7 @@ import random
 import hashlib
 import urllib, urllib2
 import json
+import functools
 
 
 class NFSN_connection(object):
@@ -64,12 +65,18 @@ class NFSN_connection(object):
         return self._execute_http_method(r)
 
 class NFSN_instance(object):
-    def __init__( self, instance_id, connection ):
+    def __init__( self, instance_id, connection, properties=[]):
         self.instance_id= instance_id
         self.connection= connection
         assert self.__class__.__name__.startswith("NFSN_")
         class_name= self.__class__.__name__[5:]
         self.base_url= "/"+ class_name +"/"+ instance_id
+        for x in properties:
+            #declare properties as class methods with optional "set" argument, i.e.: NFSN_dns.minTTL() to read minTTL, NFSN_dns.minTTL(600) to set it
+            theurl= self.base_url+"/"+x
+            f= lambda set_to=None, url=None: self._property_get_set(url, set_to)
+            setattr(self, x, functools.partial(f, url=theurl))
+
 
     def _property_get_set(self, url, set_to=None):
         if set_to is None:
@@ -85,28 +92,8 @@ class NFSN_database( NFSN_instance ):
 
 class NFSN_dns( NFSN_instance ):
     def __init__(self, *args, **kwargs):
-        NFSN_instance.__init__(self, *args, **kwargs)
-        properties= ["expire","minTTL","refresh","retry","serial"]
-
-    def expire(self, set_to=None):
-        url= self.base_url+"/expire"
-        return self._property_get_set(url, set_to)
-
-    def minTTL(self, set_to=None):
-        url= self.base_url+"/minTTL"
-        return self._property_get_set(url, set_to)
-
-    def refresh(self, set_to=None):
-        url= self.base_url+"/refresh"
-        return self._property_get_set(url, set_to)
-
-    def retry(self, set_to=None):
-        url= self.base_url+"/retry"
-        return self._property_get_set(url, set_to)
-
-    def serial(self, set_to=None):
-        url= self.base_url+"/serial"
-        return self._property_get_set(url, set_to)
+        props= ["expire","minTTL","refresh","retry","serial"]
+        NFSN_instance.__init__(self, *args, properties=props, **kwargs)
 
     def addRR( self, name, type, data, ttl ):
         url= self.base_url+"/addRR"
