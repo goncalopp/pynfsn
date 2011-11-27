@@ -13,7 +13,7 @@ README = read('README')
 setup(
     name = "pynfsn",
     version = "0.1",
-    url = 'http://github.com/goncalopp/pyNFSN',
+    url = 'http://github.com/goncalopp/pynfsn',
     license = 'CC0 1.0 Universal (CC0 1.0) Public Domain Dedication',
     description = "Module for NearlyFreeSpeech.net RESTful API",
     long_description = README,
