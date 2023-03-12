@@ -1,15 +1,3 @@
-This is a python module for the NearlyFreeSpeech.net API
+This is a python module for the NFSN API
 
 ATM only the dns part is implemented.
-I'll gladly accept patches.
-
-Project page:
-https://github.com/goncalopp/pyNFSN
-
-You can also contact me by email at gmail.com; 
-my username there is goncalopp.
-
-
-For more information about the API, see:
-https://members.nearlyfreespeech.net/wiki/API/
-(you need to login to nfsn to see the page)
